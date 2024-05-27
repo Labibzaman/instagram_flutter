@@ -1,25 +1,32 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:instagram/screens/sign_up_screen.dart';
-import 'package:instagram/utils/colors.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:instagram/resources/auth_methods.dart';
+import 'package:instagram/screens/login_screen.dart';
+
+import '../utils/colors.dart';
 import '../widgets/text_input_fileds.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+class SignUpScreen extends StatefulWidget {
+  const SignUpScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<SignUpScreen> createState() => _SignUpScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _SignUpScreenState extends State<SignUpScreen> {
   final emailTeController = TextEditingController();
   final passTeController = TextEditingController();
+  final usernameTeController = TextEditingController();
+  final bioTeController = TextEditingController();
 
   @override
   void dispose() {
     super.dispose();
     emailTeController.dispose();
     passTeController.dispose();
+    usernameTeController.dispose();
+    bioTeController.dispose();
   }
 
   @override
@@ -37,13 +44,44 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Container(),
               ),
               Hero(
-                
-                tag: 'instalogo',
+                tag: "instalogo",
                 child: SvgPicture.asset(
                   "assets/ic_instagram.svg",
                   color: primaryColor,
                   height: 64,
                 ),
+              ),
+              const SizedBox(height: 12),
+              Stack(
+                children: [
+                  const CircleAvatar(
+                    radius: 48,
+                    child: Icon(
+                      CupertinoIcons.person,
+                      size: 45,
+                    ),
+                  ),
+                  Positioned(
+                    bottom: -10,
+                    right: -8,
+                    child: IconButton(
+                      onPressed: () {},
+                      icon: const Icon(
+                        Icons.camera_alt_outlined,
+                        size: 26,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(
+                height: 22,
+              ),
+              MyTextFiled(
+                controller: usernameTeController,
+                hintText: 'User name',
+                obscure: false,
+                keyboardType: TextInputType.emailAddress,
               ),
               const SizedBox(
                 height: 22,
@@ -58,7 +96,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 height: 22,
               ),
               MyTextFiled(
-                controller: emailTeController,
+                controller: passTeController,
                 hintText: 'password',
                 obscure: true,
                 keyboardType: TextInputType.visiblePassword,
@@ -66,8 +104,24 @@ class _LoginScreenState extends State<LoginScreen> {
               const SizedBox(
                 height: 22,
               ),
+              MyTextFiled(
+                controller: bioTeController,
+                hintText: 'bio',
+                obscure: false,
+                keyboardType: TextInputType.visiblePassword,
+              ),
+              const SizedBox(
+                height: 22,
+              ),
               InkWell(
-                onTap: () {},
+                onTap: () {
+                  AuthMethods().signUp(
+                    email: emailTeController.text.trim(),
+                    userName: usernameTeController.text.trim(),
+                    password: passTeController.text.trim(),
+                    bio: bioTeController.text.trim(),
+                  );
+                },
                 child: Container(
                   padding: const EdgeInsets.symmetric(vertical: 12),
                   width: double.infinity,
@@ -77,7 +131,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         borderRadius: BorderRadius.all(Radius.circular(8)),
                       ),
                       color: Colors.blue),
-                  child: const Text('log in'),
+                  child: const Text('Sign up'),
                 ),
               ),
               Flexible(
@@ -89,21 +143,21 @@ class _LoginScreenState extends State<LoginScreen> {
                 children: [
                   Container(
                     padding: const EdgeInsets.symmetric(vertical: 8),
-                    child: const Text("Don't Have an account?"),
+                    child: const Text("Already have an account !"),
                   ),
                   GestureDetector(
                     onTap: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => const SignUpScreen(),
+                          builder: (context) => const LoginScreen(),
                         ),
                       );
                     },
                     child: Container(
                       padding: const EdgeInsets.all(8),
                       child: const Text(
-                        "SignUp",
+                        "Log in",
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ),
