@@ -1,15 +1,16 @@
-import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:instagram/resources/auth_methods.dart';
 import 'package:instagram/screens/login_screen.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:instagram/utils/image_picker.dart';
+import 'package:instagram/utils/snackbar.dart';
+import '../responsive/mobile_screen.dart';
+import '../responsive/responsive_layout_screen.dart';
+import '../responsive/web_Screen.dart';
 import '../utils/colors.dart';
 import '../widgets/text_input_fileds.dart';
 
@@ -25,7 +26,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final passTeController = TextEditingController();
   final usernameTeController = TextEditingController();
   final bioTeController = TextEditingController();
-
+  bool isLoading = false;
   Uint8List? _imageFile;
 
   @override
@@ -42,6 +43,33 @@ class _SignUpScreenState extends State<SignUpScreen> {
     setState(() {
       _imageFile = im;
     });
+  }
+
+  signUpMethod() async {
+    isLoading = true;
+    setState(() {});
+    String message = await AuthMethods().signUp(
+      email: emailTeController.text.trim(),
+      userName: usernameTeController.text.trim(),
+      password: passTeController.text.trim(),
+      bio: bioTeController.text.trim(),
+      file: _imageFile!,
+    );
+    isLoading = false;
+    setState(() {});
+    if (message != 'success') {
+      if (mounted) {
+        showSnackBar(context, message);
+      }
+    }else{
+      if(mounted){
+      Navigator.pushReplacement(context,MaterialPageRoute(builder: (context){
+        return const ResponsiveLayout(
+          webScreenLayout: WebScreen(),
+          mobileScreenLayout: MobileScreen(),
+        );
+      }));
+    }}
   }
 
   @override
@@ -152,15 +180,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 height: 22,
               ),
               InkWell(
-                onTap: () {
-                  AuthMethods().signUp(
-                    email: emailTeController.text.trim(),
-                    userName: usernameTeController.text.trim(),
-                    password: passTeController.text.trim(),
-                    bio: bioTeController.text.trim(),
-                    file: _imageFile!,
-                  );
-                },
+                onTap: signUpMethod,
                 child: Container(
                   padding: const EdgeInsets.symmetric(vertical: 12),
                   width: double.infinity,
@@ -170,7 +190,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         borderRadius: BorderRadius.all(Radius.circular(8)),
                       ),
                       color: Colors.blue),
-                  child: const Text('Sign up'),
+                  child: isLoading
+                      ? const Center(
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 3,
+                            backgroundColor: Colors.red,
+                          ),
+                        )
+                      : const Text('Sign up'),
                 ),
               ),
               Flexible(

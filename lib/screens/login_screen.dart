@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:instagram/resources/auth_methods.dart';
 import 'package:instagram/screens/sign_up_screen.dart';
 import 'package:instagram/utils/colors.dart';
+import 'package:instagram/utils/snackbar.dart';
+import '../responsive/mobile_screen.dart';
+import '../responsive/responsive_layout_screen.dart';
+import '../responsive/web_Screen.dart';
 import '../widgets/text_input_fileds.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -14,12 +19,38 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final emailTeController = TextEditingController();
   final passTeController = TextEditingController();
+  bool isLoading = false;
 
   @override
   void dispose() {
     super.dispose();
     emailTeController.dispose();
     passTeController.dispose();
+  }
+
+  void loginUser() async {
+    isLoading = true;
+    setState(() {});
+    String result = await AuthMethods()
+        .logIn(emailTeController.text.trim(), passTeController.text.trim());
+    if (result == 'Success') {
+
+      if (mounted) {
+        Navigator.pushReplacement(context,
+            MaterialPageRoute(builder: (context) {
+          return const ResponsiveLayout(
+            webScreenLayout: WebScreen(),
+            mobileScreenLayout: MobileScreen(),
+          );
+        }));
+      }
+    } else {
+      if (mounted) {
+        showSnackBar(context, result);
+      }
+    }
+    isLoading = false;
+    setState(() {});
   }
 
   @override
@@ -37,7 +68,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Container(),
               ),
               Hero(
-                
                 tag: 'instalogo',
                 child: SvgPicture.asset(
                   "assets/ic_instagram.svg",
@@ -58,7 +88,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 height: 22,
               ),
               MyTextFiled(
-                controller: emailTeController,
+                controller: passTeController,
                 hintText: 'password',
                 obscure: true,
                 keyboardType: TextInputType.visiblePassword,
@@ -67,7 +97,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 height: 22,
               ),
               InkWell(
-                onTap: () {},
+                onTap: loginUser,
                 child: Container(
                   padding: const EdgeInsets.symmetric(vertical: 12),
                   width: double.infinity,
@@ -77,7 +107,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         borderRadius: BorderRadius.all(Radius.circular(8)),
                       ),
                       color: Colors.blue),
-                  child: const Text('log in'),
+                  child:     isLoading?const Center(child: CircularProgressIndicator()):const Text('log in'),
                 ),
               ),
               Flexible(
