@@ -9,6 +9,15 @@ class AuthMethods {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _fireStore = FirebaseFirestore.instance;
 
+  Future<UserModel> getUserDetails() async {
+    DocumentSnapshot snapshot =
+        await _fireStore.collection('users').doc(_auth.currentUser?.uid).get();
+
+    UserModel userDetails = UserModel.fromSnap(snapshot);
+
+    return userDetails;
+  }
+
   //signup
   Future<String> signUp({
     required String email,
@@ -62,7 +71,7 @@ class AuthMethods {
   }
 
   Future<String> logIn(String email, dynamic password) async {
-    String message = 'Some error Occured';
+    String message = 'Some error Occurred';
 
     try {
       if (email.isNotEmpty || password.isNotEmpty) {

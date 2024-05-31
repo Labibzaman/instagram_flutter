@@ -1,6 +1,9 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:instagram/models/user_model.dart';
+import 'package:instagram/providers/user_providers.dart';
+import 'package:instagram/utils/colors.dart';
+import 'package:provider/provider.dart';
 
 class MobileScreen extends StatefulWidget {
   const MobileScreen({super.key});
@@ -10,30 +13,83 @@ class MobileScreen extends StatefulWidget {
 }
 
 class _MobileScreenState extends State<MobileScreen> {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
-  String userName = "";
+   int _page = 0;
+  late PageController pageController;
+
 
   @override
   void initState() {
     super.initState();
-    getUserName();
+    pageController = PageController();
   }
 
-  void getUserName() async {
-    DocumentSnapshot snapshot = await firebaseFirestore
-        .collection('users')
-        .doc(_auth.currentUser?.uid)
-        .get();
+  void onTapped(int page) {
+    pageController.jumpToPage(page);
+  }
 
-    userName = (snapshot.data() as Map<String, dynamic>)['username'];
-    setState(() {});
+  void onChangedPage(int page){
+    setState(() {
+      _page=page;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(child: Text('Hi! $userName')),
+      bottomNavigationBar: CupertinoTabBar(
+        onTap: onTapped,
+        backgroundColor: mobileBackgroundColor,
+        items: [
+          BottomNavigationBarItem(
+              icon: Icon(
+                Icons.home_filled,
+                color: _page == 0 ? primaryColor : secondaryColor,
+              ),
+              label: '',
+              backgroundColor: primaryColor),
+          BottomNavigationBarItem(
+            icon: Icon(
+              Icons.search,
+              color: _page == 1 ? primaryColor : secondaryColor,
+            ),
+            label: '',
+            backgroundColor: primaryColor,
+          ),
+          BottomNavigationBarItem(
+              icon: Icon(
+                CupertinoIcons.plus_circle,
+                color: _page == 2 ? primaryColor : secondaryColor,
+              ),
+              label: '',
+              backgroundColor: primaryColor),
+          BottomNavigationBarItem(
+              icon: Icon(
+                Icons.favorite ,
+                color: _page == 3 ? primaryColor : secondaryColor,
+              ),
+              label: '',
+              backgroundColor: primaryColor),
+          BottomNavigationBarItem(
+            icon: Icon(
+              CupertinoIcons.person,
+              color: _page == 4 ? primaryColor : secondaryColor,
+            ),
+            label: '',
+            backgroundColor: primaryColor,
+          ),
+        ],
+      ),
+      body: PageView(
+        controller: pageController,
+        onPageChanged: onChangedPage,
+        children: const [
+          Center(child: Text('home')),
+          Center(child: Text('search')),
+          Center(child: Text('plus')),
+          Center(child: Text('favourite')),
+          Center(child: Text('profile')),
+        ],
+      )
     );
   }
 }
