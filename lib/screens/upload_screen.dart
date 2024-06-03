@@ -111,8 +111,7 @@ class _UploadScreenState extends State<UploadScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     CircleAvatar(
-                        // Uncomment and replace 'photoURl' with the correct property name from your UserModel.
-                        // backgroundImage: NetworkImage(userModel.photoURl),
+                        backgroundImage: NetworkImage(userModel.photoURl),
                         ),
                     SizedBox(
                       width: MediaQuery.of(context).size.width * 0.3,

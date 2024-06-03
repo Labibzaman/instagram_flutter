@@ -7,6 +7,7 @@ class StorageMethods {
   FirebaseStorage firebaseStorage = FirebaseStorage.instance;
   FirebaseAuth auth = FirebaseAuth.instance;
 
+
   Future<String> uploadToCloud(String childName, Uint8List file, bool isPost) async {
     Reference ref =
         firebaseStorage.ref().child(childName).child(auth.currentUser!.uid);
