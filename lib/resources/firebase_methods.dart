@@ -35,7 +35,7 @@ class FirebaseMethods {
       );
 
       firebaseFirestore.collection('posts').doc(postID).set(postModel.toJson());
-      ref = 'Success';
+      ref = 'success';
 
     } catch (err) {
       ref = err.toString();

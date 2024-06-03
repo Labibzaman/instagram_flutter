@@ -1,14 +1,13 @@
 import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:instagram/resources/firebase_methods.dart';
 import 'package:provider/provider.dart';
-
 import '../models/user_model.dart';
 import '../providers/user_providers.dart';
 import '../utils/colors.dart';
 import '../utils/image_picker.dart';
+import '../utils/snackbar.dart'; // Ensure you have this import for showSnackBar
 
 class UploadScreen extends StatefulWidget {
   const UploadScreen({super.key});
@@ -23,29 +22,56 @@ class _UploadScreenState extends State<UploadScreen> {
   bool isLoading = false;
 
   Future<void> refreshUserData() async {
-    Provider.of<UserProvider>(context).refreshUser();
+    await Provider.of<UserProvider>(context, listen: false).refreshUser();
   }
 
-   postMethod(
+  Future<String> postMethod(
     String uid,
     String username,
     String profImage,
   ) async {
-    String ref = 'created';
-    isLoading = true;
-    setState(() {});
-    FirebaseMethods().postMethod(
-        uid, descriptionController.text, username, profImage, _file!);
-    isLoading=false;
     setState(() {
-      ref = 'posted';
-
+      isLoading = true;
     });
-    return ref;
 
+    try {
+      String response = await FirebaseMethods().postMethod(
+        uid,
+        descriptionController.text,
+        username,
+        profImage,
+        _file!,
+      );
+
+      print('Response from postMethod: $response');
+      if (response == 'success') {
+        if (mounted) {
+          showSnackBar(context, 'Post uploaded successfully');
+          clearImage();
+        }
+      } else {
+        if (mounted) {
+          showSnackBar(context, 'Failed to upload post');
+        }
+      }
+      return response;
+    } catch (e) {
+      if (mounted) {
+        showSnackBar(context, 'Error: $e');
+      }
+      return 'failed';
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
 
-  _selectImage(BuildContext context) async {
+  void clearImage (){
+    _file=null;
+  }
+
+  Future<void> _selectImage(BuildContext context) async {
     return showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -117,7 +143,6 @@ class _UploadScreenState extends State<UploadScreen> {
               title: const Text('POST TO'),
               centerTitle: false,
               actions: [
-
                 TextButton(
                   onPressed: () {
                     postMethod(
@@ -132,20 +157,22 @@ class _UploadScreenState extends State<UploadScreen> {
             ),
             body: Column(
               children: [
+                isLoading
+                    ? const LinearProgressIndicator(
+                        backgroundColor: Colors.blue,
+                      )
+                    : const SizedBox(height: 10),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    isLoading ==true ? const LinearProgressIndicator(backgroundColor: Colors.blue,):Container(
-                      width: 10,
-                      height: 10,
-                    ),
                     CircleAvatar(
                       backgroundImage: NetworkImage(userModel.photoURl),
                     ),
                     SizedBox(
                       width: MediaQuery.of(context).size.width * 0.3,
                       child: TextFormField(
+                        controller: descriptionController,
                         decoration: const InputDecoration(
                           hintText: 'Write a caption..',
                           border: InputBorder.none,
