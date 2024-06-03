@@ -2,6 +2,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:instagram/resources/firebase_methods.dart';
 import 'package:provider/provider.dart';
 
 import '../models/user_model.dart';
@@ -18,9 +19,30 @@ class UploadScreen extends StatefulWidget {
 
 class _UploadScreenState extends State<UploadScreen> {
   Uint8List? _file;
+  TextEditingController descriptionController = TextEditingController();
+  bool isLoading = false;
 
   Future<void> refreshUserData() async {
     Provider.of<UserProvider>(context).refreshUser();
+  }
+
+   postMethod(
+    String uid,
+    String username,
+    String profImage,
+  ) async {
+    String ref = 'created';
+    isLoading = true;
+    setState(() {});
+    FirebaseMethods().postMethod(
+        uid, descriptionController.text, username, profImage, _file!);
+    isLoading=false;
+    setState(() {
+      ref = 'posted';
+
+    });
+    return ref;
+
   }
 
   _selectImage(BuildContext context) async {
@@ -95,8 +117,12 @@ class _UploadScreenState extends State<UploadScreen> {
               title: const Text('POST TO'),
               centerTitle: false,
               actions: [
+
                 TextButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    postMethod(
+                        userModel.uid, userModel.userName, userModel.photoURl);
+                  },
                   child: const Text(
                     'POST',
                     style: TextStyle(color: Colors.blueAccent),
@@ -110,9 +136,13 @@ class _UploadScreenState extends State<UploadScreen> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
+                    isLoading ==true ? const LinearProgressIndicator(backgroundColor: Colors.blue,):Container(
+                      width: 10,
+                      height: 10,
+                    ),
                     CircleAvatar(
-                        backgroundImage: NetworkImage(userModel.photoURl),
-                        ),
+                      backgroundImage: NetworkImage(userModel.photoURl),
+                    ),
                     SizedBox(
                       width: MediaQuery.of(context).size.width * 0.3,
                       child: TextFormField(

@@ -8,11 +8,13 @@ class PostModel {
   final String uid;
   final String profImage;
   final String postUrl;
+  final String postId;
   final likes;
   final datePublished;
 
   PostModel({
     required this.uid,
+    required this.postId,
     required this.postUrl,
     required this.description,
     required this.userName,
@@ -39,10 +41,11 @@ class PostModel {
       uid: snapshot['uid'] ?? '',
       userName: snapshot['username'] ?? '',
       description: snapshot['description'] ?? '',
-      likes:snapshot['likes'] ?? '',
+      likes: snapshot['likes'] ?? '',
       datePublished: snapshot['datePublished'] ?? '',
       profImage: snapshot['profImage'] ?? '',
       postUrl: snapshot['postUrl'] ?? '',
+      postId: snapshot['postId'] ?? '',
     );
   }
 }
