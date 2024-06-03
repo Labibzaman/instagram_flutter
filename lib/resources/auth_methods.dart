@@ -10,19 +10,19 @@ class AuthMethods {
   final FirebaseFirestore _fireStore = FirebaseFirestore.instance;
 
   Future<UserModel> getUserDetails() async {
+    User currentUser = _auth.currentUser!;
+
     DocumentSnapshot snapshot =
-        await _fireStore.collection('users').doc(_auth.currentUser?.uid).get();
+    await _fireStore.collection('users').doc(currentUser.uid).get();
 
-    UserModel userDetails = UserModel.fromSnap(snapshot);
-
-    return userDetails;
+    return UserModel.fromSnap(snapshot);
   }
 
   //signup
   Future<String> signUp({
     required String email,
-    required dynamic userName,
-    required dynamic password,
+    required String userName,
+    required String password,
     required String bio,
     required Uint8List file,
   }) async {
@@ -33,14 +33,14 @@ class AuthMethods {
           userName.isNotEmpty ||
           password.isNotEmpty ||
           bio.isNotEmpty ||
-          file != null) {
+          file !=null) {
         UserCredential cred = await _auth.createUserWithEmailAndPassword(
           email: email,
           password: password,
         );
 
         String photoUrl =
-            await StorageMethods().uploadToCloud('profilePics', file!, false);
+        await StorageMethods().uploadToCloud('profilePics', file!, false);
 
         UserModel userModel = UserModel(
           uid: cred.user!.uid,
