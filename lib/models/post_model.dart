@@ -25,10 +25,12 @@ class PostModel {
 
   Map<String, dynamic> toJson() => {
         "uid": uid,
+        "postURL": postUrl,
         "description": description,
         "username": userName,
         "likes": likes,
         "profImage": profImage,
+        "postId": postId,
         "datePublished": datePublished,
       };
 

@@ -6,7 +6,7 @@ import '../screens/upload_screen.dart';
 const webScreenSize = 600;
 
 final homeScreenItems = [
-  const Center(child: FeedScreen()),
+   Center(child: FeedScreen()),
   const Center(child: Text('search')),
   const UploadScreen(),
   const Center(child: Text('favourite')),

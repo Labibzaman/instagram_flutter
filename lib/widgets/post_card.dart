@@ -1,8 +1,12 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:instagram/utils/colors.dart';
+import 'package:intl/intl.dart';
 
 class PostCard extends StatelessWidget {
-  const PostCard({super.key});
+  PostCard({super.key, required this.snap});
+
+  final snap;
 
   @override
   Widget build(BuildContext context) {
@@ -20,22 +24,21 @@ class PostCard extends StatelessWidget {
             ).copyWith(right: 0),
             child: Row(
               children: [
-                const CircleAvatar(
-                  radius: 16,
+                CircleAvatar(
                   backgroundImage: NetworkImage(
-                    'https://images.unsplash.com/photo-1717167172399-6c6977898fc2?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+                    "${snap['profImage']}",
                   ),
                 ),
-                const Expanded(
+                Expanded(
                   child: Padding(
-                    padding: EdgeInsets.only(left: 8),
+                    padding: const EdgeInsets.only(left: 8),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'username',
-                          style: TextStyle(fontWeight: FontWeight.bold),
+                          "${snap['username']}",
+                          style: const TextStyle(fontWeight: FontWeight.bold),
                         )
                       ],
                     ),
@@ -70,10 +73,7 @@ class PostCard extends StatelessWidget {
           SizedBox(
             height: MediaQuery.of(context).size.height * 0.3,
             width: double.infinity,
-            child: Image.asset(
-              'assets/3.png',
-              fit: BoxFit.fill,
-            ),
+            child: Image.network("${snap['postURL']}")
           ),
           Row(
             children: [
@@ -103,7 +103,6 @@ class PostCard extends StatelessWidget {
             ],
           ),
           Container(
-
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -115,22 +114,22 @@ class PostCard extends StatelessWidget {
                       .subtitle2!
                       .copyWith(fontWeight: FontWeight.w800),
                   child: Text(
-                    '1234 likes',
+                    "${snap['likes'].length}",
                     style: Theme.of(context).textTheme.bodyText2,
                   ),
                 ),
                 Container(
                   width: double.infinity,
                   child: RichText(
-                    text: const TextSpan(
+                    text:  TextSpan(
                       children: [
                         TextSpan(
-                          text: 'username',
-                          style: TextStyle(fontWeight: FontWeight.bold),
+                          text:"${snap['username']}",
+                          style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
                         TextSpan(
-                          text: ' hey this is Caption',
-                          style: TextStyle(fontWeight: FontWeight.w300),
+                          text: " ${snap['description']}",
+                          style: const TextStyle(fontWeight: FontWeight.w300),
                         ),
                       ],
                     ),
@@ -138,10 +137,22 @@ class PostCard extends StatelessWidget {
                 ),
                 Container(
                   alignment: Alignment.topLeft,
-                  padding: EdgeInsets.all(4),
+                  padding: const EdgeInsets.symmetric(vertical: 3),
                   width: double.infinity,
-                  child: Text('View all 200 comments'),
-                )
+                  child: const Text(
+                    'View all 200 comments',
+                    style: TextStyle(color: secondaryColor),
+                  ),
+                ),
+                Container(
+                  alignment: Alignment.topLeft,
+                  padding: const EdgeInsets.symmetric(vertical: 0),
+                  width: double.infinity,
+                  child:  Text(
+                    DateFormat.yMMMd().format(snap['datePublished'].toDate()),
+                    style: const TextStyle(color: secondaryColor),
+                  ),
+                ),
               ],
             ),
           ),
