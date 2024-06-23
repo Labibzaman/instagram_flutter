@@ -56,6 +56,9 @@ class _LikeAnimationState extends State<LikeAnimation>
 
   @override
   Widget build(BuildContext context) {
-    return Container();
+    return ScaleTransition(
+      scale: scale,
+      child: widget.child,
+    );
   }
 }

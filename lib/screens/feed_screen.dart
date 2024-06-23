@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:instagram/screens/comment_screen.dart';
 import 'package:instagram/utils/colors.dart';
 
 import '../widgets/post_card.dart';
@@ -41,7 +42,9 @@ class _FeedScreenState extends State<FeedScreen> {
             ),
           ),
           IconButton(
-            onPressed: () {},
+            onPressed: () {
+
+            },
             icon: Container(
               height: 26,
               child: Image.asset(
@@ -53,7 +56,7 @@ class _FeedScreenState extends State<FeedScreen> {
         ],
       ),
       body: StreamBuilder(
-        stream: firebaseFirestore.collection('posts').snapshots(),
+        stream: firebaseFirestore.collection('posts').orderBy('datePublished',descending: true).snapshots(),
         builder: (BuildContext context,
             AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
 
