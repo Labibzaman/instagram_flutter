@@ -22,13 +22,13 @@ class PostCard extends StatefulWidget {
 }
 
 class _PostCardState extends State<PostCard> {
+  FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
   bool isAnimating = false;
+  int commentLength = 0;
 
   @override
   Widget build(BuildContext context) {
-    UserModel? userModel = Provider
-        .of<UserProvider>(context)
-        .getUser;
+    UserModel? userModel = Provider.of<UserProvider>(context).getUser;
 
     return Container(
       color: mobileBackgroundColor,
@@ -74,15 +74,14 @@ class _PostCardState extends State<PostCard> {
                                   shrinkWrap: true,
                                   children: const ['Delete', 'Share']
                                       .map(
-                                        (e) =>
-                                        InkWell(
+                                        (e) => InkWell(
                                           child: Container(
                                             padding: const EdgeInsets.symmetric(
                                                 vertical: 12, horizontal: 16),
                                             child: Text(e),
                                           ),
                                         ),
-                                  )
+                                      )
                                       .toList()));
                         });
                   },
@@ -93,7 +92,8 @@ class _PostCardState extends State<PostCard> {
           ),
           GestureDetector(
             onDoubleTap: () async {
-              await FirebaseMethods().likePostMethod(widget.snap['postId'], userModel!.uid, widget.snap['likes']);
+              await FirebaseMethods().likePostMethod(
+                  widget.snap['postId'], userModel!.uid, widget.snap['likes']);
 
               setState(() {
                 isAnimating = true;
@@ -103,10 +103,7 @@ class _PostCardState extends State<PostCard> {
               alignment: Alignment.center,
               children: [
                 SizedBox(
-                    height: MediaQuery
-                        .of(context)
-                        .size
-                        .height * 0.3,
+                    height: MediaQuery.of(context).size.height * 0.3,
                     width: double.infinity,
                     child: Image.network("${widget.snap['postURL']}")),
                 AnimatedOpacity(
@@ -134,17 +131,20 @@ class _PostCardState extends State<PostCard> {
               LikeAnimation(
                 isAnimating: widget.snap['likes'].contains(userModel?.uid),
                 child: IconButton(
-                  onPressed: () {},
-                  icon:widget.snap['likes'].contains(userModel?.uid)? const Icon(
-                    Icons.favorite,
-                    color: Colors.redAccent,
-                  ):const Icon(Icons.favorite_outline)
-                ),
+                    onPressed: () {},
+                    icon: widget.snap['likes'].contains(userModel?.uid)
+                        ? const Icon(
+                            Icons.favorite,
+                            color: Colors.redAccent,
+                          )
+                        : const Icon(Icons.favorite_outline)),
               ),
               IconButton(
                 onPressed: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context){
-                    return CommentScreen(snap: widget.snap['postId'],);
+                  Navigator.push(context, MaterialPageRoute(builder: (context) {
+                    return CommentScreen(
+                      snap: widget.snap['postId'],
+                    );
                   }));
                 },
                 icon: const Icon(Icons.comment_bank),
@@ -170,17 +170,13 @@ class _PostCardState extends State<PostCard> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 DefaultTextStyle(
-                  style: Theme
-                      .of(context)
+                  style: Theme.of(context)
                       .textTheme
                       .subtitle2!
                       .copyWith(fontWeight: FontWeight.w800),
                   child: Text(
                     "${widget.snap['likes'].length}",
-                    style: Theme
-                        .of(context)
-                        .textTheme
-                        .bodyText2,
+                    style: Theme.of(context).textTheme.bodyText2,
                   ),
                 ),
                 Container(
@@ -200,14 +196,33 @@ class _PostCardState extends State<PostCard> {
                     ),
                   ),
                 ),
-                Container(
-                  alignment: Alignment.topLeft,
-                  padding: const EdgeInsets.symmetric(vertical: 3),
-                  width: double.infinity,
-                  child: const Text(
-                    'View all 200 comments',
-                    style: TextStyle(color: secondaryColor),
-                  ),
+                StreamBuilder(
+                  stream: firebaseFirestore
+                      .collection('posts')
+                      .doc(widget.snap['postId'])
+                      .collection('comments')
+                      .snapshots(),
+                  builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+                    if (snapshot.hasError) {
+                      return const Center(child: Text('Something went wrong'));
+                    }
+                    if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                      return const Center(child: Text('Be the first to comment'));
+                    }
+                    commentLength = snapshot.data!.docs.length;
+                    return Container(
+                      alignment: Alignment.topLeft,
+                      padding: const EdgeInsets.symmetric(vertical: 3),
+                      width: double.infinity,
+                      child: Text(
+                        'View all $commentLength comments',
+                        style: const TextStyle(color: secondaryColor),
+                      ),
+                    );
+                  },
                 ),
                 Container(
                   alignment: Alignment.topLeft,
