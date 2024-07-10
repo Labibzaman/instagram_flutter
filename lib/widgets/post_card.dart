@@ -1,11 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:instagram/models/user_model.dart';
 import 'package:instagram/providers/user_providers.dart';
 import 'package:instagram/resources/firebase_methods.dart';
 import 'package:instagram/utils/colors.dart';
+import 'package:instagram/utils/snackbar.dart';
 import 'package:instagram/widgets/like_animation.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -13,7 +12,7 @@ import 'package:provider/provider.dart';
 import '../screens/comment_screen.dart';
 
 class PostCard extends StatefulWidget {
-  PostCard({super.key, required this.snap});
+  const PostCard({super.key, required this.snap});
 
   final snap;
 
@@ -70,19 +69,33 @@ class _PostCardState extends State<PostCard> {
                         context: context,
                         builder: (context) {
                           return Dialog(
-                              child: ListView(
-                                  shrinkWrap: true,
-                                  children: const ['Delete', 'Share']
-                                      .map(
-                                        (e) => InkWell(
-                                          child: Container(
-                                            padding: const EdgeInsets.symmetric(
-                                                vertical: 12, horizontal: 16),
-                                            child: Text(e),
-                                          ),
-                                        ),
-                                      )
-                                      .toList()));
+                            child: ListView(
+                              shrinkWrap: true,
+                              children: const ['Delete', 'Share']
+                                  .map(
+                                    (e) => InkWell(
+                                      onTap: () {
+                                        if (e == 'Delete') {
+                                          FirebaseMethods().deletePost(
+                                              widget.snap['postId']);
+                                          Navigator.pop(context);
+                                        }
+                                        if (e == 'Share') {
+                                          showSnackBar(context,
+                                              'Your post is shared to public');
+                                          Navigator.pop(context);
+                                        }
+                                      },
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 12, horizontal: 16),
+                                        child: Text(e),
+                                      ),
+                                    ),
+                                  )
+                                  .toList(),
+                            ),
+                          );
                         });
                   },
                   icon: const Icon(Icons.more_vert_sharp),
@@ -179,7 +192,7 @@ class _PostCardState extends State<PostCard> {
                     style: Theme.of(context).textTheme.bodyText2,
                   ),
                 ),
-                Container(
+                SizedBox(
                   width: double.infinity,
                   child: RichText(
                     text: TextSpan(
@@ -210,7 +223,8 @@ class _PostCardState extends State<PostCard> {
                       return const Center(child: Text('Something went wrong'));
                     }
                     if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                      return const Center(child: Text('Be the first to comment'));
+                      return const Center(
+                          child: Text('Be the first to comment'));
                     }
                     commentLength = snapshot.data!.docs.length;
                     return Container(

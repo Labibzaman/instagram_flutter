@@ -73,4 +73,9 @@ class FirebaseMethods {
       'postId':postId
     });
   }
+
+  Future<void>deletePost(String postId) async{
+    await firebaseFirestore.collection('posts').doc(postId).delete();
+  }
+
 }
