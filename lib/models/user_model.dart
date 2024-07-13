@@ -9,8 +9,12 @@ class UserModel {
   final String photoURl;
   final String password;
   final String bio;
+  final List followers;
+  final List following;
 
   UserModel({
+    required this.followers,
+    required this.following,
     required this.uid,
     required this.photoURl,
     required this.email,
@@ -23,9 +27,11 @@ class UserModel {
         "uid": uid,
         "email": email,
         "username": userName,
+        'followers': followers,
+        'following': following,
         "password": password,
         "bio": bio,
-        "profilePic": photoURl
+        "profilePic": photoURl,
       };
 
   static UserModel fromSnap(DocumentSnapshot snap) {
@@ -34,11 +40,14 @@ class UserModel {
 
     return UserModel(
       uid: snapshot['uid'] ?? '',
+
       photoURl: snapshot['profilePic'] ?? '',
       email: snapshot['email'] ?? '',
       userName: snapshot['username'] ?? '',
-      password: snapshot['password'] ?? '', // Assuming password can be of any type
+      password: snapshot['password'] ?? '',
       bio: snapshot['bio'] ?? '',
+      followers: [],
+      following: [],
     );
   }
 }

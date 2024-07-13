@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import '../screens/feed_screen.dart';
@@ -12,5 +13,7 @@ final homeScreenItems = [
   const Center(child: SearchScreen()),
   const UploadScreen(),
   const Center(child: Text('favourite')),
-   const Center(child: ProfileScreen()),
+  Center(
+    child: ProfileScreen(uid: FirebaseAuth.instance.currentUser!.uid),
+  ),
 ];

@@ -13,7 +13,7 @@ class AuthMethods {
     User currentUser = _auth.currentUser!;
 
     DocumentSnapshot snapshot =
-    await _fireStore.collection('users').doc(currentUser.uid).get();
+        await _fireStore.collection('users').doc(currentUser.uid).get();
 
     return UserModel.fromSnap(snapshot);
   }
@@ -33,14 +33,14 @@ class AuthMethods {
           userName.isNotEmpty ||
           password.isNotEmpty ||
           bio.isNotEmpty ||
-          file !=null) {
+          file != null) {
         UserCredential cred = await _auth.createUserWithEmailAndPassword(
           email: email,
           password: password,
         );
 
         String photoUrl =
-        await StorageMethods().uploadToCloud('profilePics', file!, false);
+            await StorageMethods().uploadToCloud('profilePics', file!, false);
 
         UserModel userModel = UserModel(
           uid: cred.user!.uid,
@@ -49,6 +49,8 @@ class AuthMethods {
           userName: userName,
           password: password,
           bio: bio,
+          followers: [],
+          following: [],
         );
 
         _fireStore
